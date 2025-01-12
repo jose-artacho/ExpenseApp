@@ -11,11 +11,10 @@ import androidx.compose.material.icons.filled.Workspaces
 import androidx.compose.ui.graphics.vector.ImageVector
 
 data class Expense(
-    val id: Long,
-    val description: String,
-    val amount: Double,
-    val date: String,
-    val category: Category
+    val description: String = "",
+    val amount: Double = 0.0,
+    val date: String = "",
+    val category: Category = Category.OTHER
 )
 
 enum class Category(val icon: ImageVector) {

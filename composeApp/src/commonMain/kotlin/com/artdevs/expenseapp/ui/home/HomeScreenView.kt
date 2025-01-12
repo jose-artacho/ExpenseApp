@@ -1,12 +1,12 @@
 package com.artdevs.expenseapp.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
@@ -16,8 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.artdevs.expenseapp.domain.model.Category
+import com.artdevs.expenseapp.domain.model.Expense
 
 @Composable
 fun HomeScreenView() {
@@ -35,7 +38,33 @@ fun HomeScreenView() {
             CardSection(title = "Total Expense", amount = "100 €")
 
             // Latest Entries
-            LatestEntriesSection()
+            val expenses = listOf(
+                Expense(
+                    amount = 20.0,
+                    date = "15 Mar 2024",
+                    category = Category.TRAVEL,
+                    description = "travel expense"
+                ),
+                Expense(
+                    amount = 16.0,
+                    date = "16 Mar 2024",
+                    category = Category.INVOICE,
+                    description = "travel expense"
+                ),
+                Expense(
+                    amount = 15.0,
+                    date = "17 Mar 2024",
+                    category = Category.SHOPPING,
+                    description = "travel expense"
+                ),
+                Expense(
+                    amount = 13.0,
+                    date = "19 Mar 2024",
+                    category = Category.RESTAURANT,
+                    description = "travel expense"
+                ),
+            )
+            LatestEntriesSection(expenses)
         }
 
         FloatingActionButton(
@@ -84,14 +113,12 @@ fun CardSection(title: String, amount: String) {
             modifier = Modifier
                 .padding(horizontal = 4.dp)
                 .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
-                    .align(Alignment.CenterHorizontally)
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.AccountBox,
+                    imageVector = Icons.Default.AccountBalanceWallet,
                     contentDescription = "Total expense icon",
                     tint = Color.White
                 )
@@ -105,7 +132,7 @@ fun CardSection(title: String, amount: String) {
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Text(
                     text = amount,
                     fontSize = 22.sp,
@@ -118,47 +145,47 @@ fun CardSection(title: String, amount: String) {
 }
 
 @Composable
-fun LatestEntriesSection() {
+fun LatestEntriesSection(expenses: List<Expense>) {
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 24.dp, vertical = 32.dp),
+            .background(Color.White),
     ) {
         Text(
+            modifier = Modifier.padding(24.dp),
             text = "Latest Entries",
-            fontSize = 18.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        EntryItem(
-            icon = "Food",
-            date = "20 Feb 2024",
-            amount = "+ $20 + Vat 0.5%"
-        )
-        EntryItem(
-            icon = "Uber",
-            date = "13 Mar 2024",
-            amount = "- $18 + Vat 0.8%"
-        )
-        EntryItem(
-            icon = "Shopping",
-            date = "11 Mar 2024",
-            amount = "- $400 + Vat 0.12%"
-        )
+        expenses.forEach { expense ->
+            EntryItem(expense = expense) {
+            }
+        }.takeIf { expenses.isEmpty() }?.run {
+            Text(
+                modifier = Modifier.fillMaxSize().padding(24.dp),
+                text = "No expenses yet",
+                fontSize = 18.sp,
+                color = Color.LightGray,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
 @Composable
-fun EntryItem(icon: String, date: String, amount: String) {
+fun EntryItem(expense: Expense, onClick: (expense: Expense) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .clickable {
+                onClick(expense)
+            }
+            .padding(horizontal = 24.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
@@ -167,8 +194,8 @@ fun EntryItem(icon: String, date: String, amount: String) {
             modifier = Modifier.size(48.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.ShoppingCart,
-                contentDescription = "",
+                imageVector = expense.category.icon,
+                contentDescription = expense.category.name,
                 tint = Color.Black,
                 modifier = Modifier.padding(8.dp)
             )
@@ -177,12 +204,22 @@ fun EntryItem(icon: String, date: String, amount: String) {
         Spacer(modifier = Modifier.width(16.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = icon, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-            Text(text = date, fontSize = 14.sp, color = Color.Gray)
+            Text(
+                text = expense.category.name,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            Text(text = expense.date, fontSize = 14.sp, color = Color.Gray)
         }
 
         Column(horizontalAlignment = Alignment.End) {
-            Text(text = amount, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(
+                text = expense.amount.toString() + " €",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
         }
     }
 }
