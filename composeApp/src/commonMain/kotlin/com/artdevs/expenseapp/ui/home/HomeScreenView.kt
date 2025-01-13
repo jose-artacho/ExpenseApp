@@ -2,15 +2,30 @@ package com.artdevs.expenseapp.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,11 +34,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.artdevs.expenseapp.domain.model.Category
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.artdevs.expenseapp.data.ExpenseDataManager
 import com.artdevs.expenseapp.domain.model.Expense
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun HomeScreenView() {
+fun HomeScreenView(onAddExpenseClick: () -> Unit, onExpenseClick: (expense: Expense) -> Unit) {
+
+    val viewModel = koinViewModel<HomeScreenViewModel>()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -38,37 +59,13 @@ fun HomeScreenView() {
             CardSection(title = "Total Expense", amount = "100 €")
 
             // Latest Entries
-            val expenses = listOf(
-                Expense(
-                    amount = 20.0,
-                    date = "15 Mar 2024",
-                    category = Category.TRAVEL,
-                    description = "travel expense"
-                ),
-                Expense(
-                    amount = 16.0,
-                    date = "16 Mar 2024",
-                    category = Category.INVOICE,
-                    description = "travel expense"
-                ),
-                Expense(
-                    amount = 15.0,
-                    date = "17 Mar 2024",
-                    category = Category.SHOPPING,
-                    description = "travel expense"
-                ),
-                Expense(
-                    amount = 13.0,
-                    date = "19 Mar 2024",
-                    category = Category.RESTAURANT,
-                    description = "travel expense"
-                ),
-            )
-            LatestEntriesSection(expenses)
+            LatestEntriesSection(ExpenseDataManager.fakeExpenseLit) {
+                onExpenseClick(it)
+            }
         }
 
         FloatingActionButton(
-            onClick = { /* TODO: Add new entry action */ },
+            onClick = { onAddExpenseClick() },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp),
@@ -145,7 +142,7 @@ fun CardSection(title: String, amount: String) {
 }
 
 @Composable
-fun LatestEntriesSection(expenses: List<Expense>) {
+fun LatestEntriesSection(expenses: List<Expense>, onExpenseClick: (expense: Expense) -> Unit) {
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
@@ -164,6 +161,7 @@ fun LatestEntriesSection(expenses: List<Expense>) {
 
         expenses.forEach { expense ->
             EntryItem(expense = expense) {
+                onExpenseClick(it)
             }
         }.takeIf { expenses.isEmpty() }?.run {
             Text(

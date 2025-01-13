@@ -9,8 +9,12 @@ import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.TravelExplore
 import androidx.compose.material.icons.filled.Workspaces
 import androidx.compose.ui.graphics.vector.ImageVector
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 data class Expense(
+    val id: String = Uuid.random().toString(),
     val description: String = "",
     val amount: Double = 0.0,
     val date: String = "",
