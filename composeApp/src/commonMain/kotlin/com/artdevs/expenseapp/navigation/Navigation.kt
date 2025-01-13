@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.artdevs.expenseapp.ui.addexpense.AddExpenseScreenView
 import com.artdevs.expenseapp.ui.home.HomeScreenView
 
 @Composable
@@ -29,6 +30,9 @@ fun Navigation() {
             val expenseId = it.arguments?.getLong("expenseId")
         }
         composable("addExpense") {
+            AddExpenseScreenView(
+                navController
+            )
         }
     }
 }

@@ -50,6 +50,7 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.sqldelight.coroutines)
             implementation(libs.navigation.compose)
+            implementation(libs.date.time)
         }
 
         androidMain.dependencies {
