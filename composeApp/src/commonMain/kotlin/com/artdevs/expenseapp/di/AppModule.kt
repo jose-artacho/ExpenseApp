@@ -7,9 +7,9 @@ import com.artdevs.expenseapp.db.ExpenseDatabase
 import com.artdevs.expenseapp.domain.usecases.AddExpenseUseCase
 import com.artdevs.expenseapp.domain.usecases.GetExpensesUseCase
 import com.artdevs.expenseapp.domain.usecases.RemoveExpenseUseCase
+import com.artdevs.expenseapp.ui.addexpense.AddExpenseScreenViewModel
 import com.artdevs.expenseapp.ui.home.HomeScreenViewModel
-import org.koin.core.context.startKoin
-import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 fun appModule(db: ExpenseDatabase) = module {
@@ -20,5 +20,6 @@ fun appModule(db: ExpenseDatabase) = module {
     single { GetExpensesUseCase(get()) }
     single { RemoveExpenseUseCase(get()) }
 
-    viewModelOf(::HomeScreenViewModel)
+    viewModel { HomeScreenViewModel(get()) }
+    viewModel { AddExpenseScreenViewModel(get()) }
 }

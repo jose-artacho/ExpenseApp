@@ -2,7 +2,6 @@ package com.artdevs.expenseapp.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.artdevs.expenseapp.domain.model.ExpenseUiState
 import com.artdevs.expenseapp.domain.usecases.GetExpensesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

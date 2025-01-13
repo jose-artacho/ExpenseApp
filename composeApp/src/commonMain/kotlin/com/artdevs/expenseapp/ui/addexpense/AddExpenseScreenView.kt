@@ -1,16 +1,40 @@
 package com.artdevs.expenseapp.ui.addexpense
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,27 +42,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.artdevs.expenseapp.domain.model.Category
+import com.artdevs.expenseapp.domain.model.Expense
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreenView(navController: NavController = rememberNavController()) {
+
+    val viewModel = koinViewModel<AddExpenseScreenViewModel>()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
     var description by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("Food") }
+    var selectedCategory by remember { mutableStateOf(Category.OTHER) }
     var selectedDate by remember {
         mutableStateOf(
             Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         )
     }
 
-    val categories = listOf("Food", "Transport", "Shopping", "Other")
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isCategorySheetOpen by remember { mutableStateOf(false) }
     var isDatePickerOpen by remember { mutableStateOf(false) }
@@ -77,12 +108,34 @@ fun AddExpenseScreenView(navController: NavController = rememberNavController())
             AmountField(amount) { amount = it }
             CategorySelector(selectedCategory, { isCategorySheetOpen = true })
             DateSelector(selectedDate, { isDatePickerOpen = true })
-            SaveButton()
+            SaveButton {
+                val expense = Expense(
+                    description = description,
+                    amount = amount.toDouble(),
+                    category = selectedCategory,
+                    date = selectedDate.toString()
+                )
+                viewModel.addExpense(expense)
+            }
+
+            when (state) {
+                is AddExpenseUiState.Loading -> {
+                    // Show loading state
+                }
+
+                is AddExpenseUiState.Success -> {
+                    navController.popBackStack()
+                }
+
+                is AddExpenseUiState.Error -> {
+                    // Show error state
+                }
+            }
         }
 
         if (isCategorySheetOpen) {
             CategoryBottomSheet(
-                categories = categories,
+                categories = Category.entries.toList(),
                 onCategorySelected = {
                     selectedCategory = it
                     isCategorySheetOpen = false
@@ -125,7 +178,7 @@ fun AmountField(value: String, onValueChange: (String) -> Unit) {
 }
 
 @Composable
-fun CategorySelector(selectedCategory: String, onClick: () -> Unit) {
+fun CategorySelector(selectedCategory: Category, onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth()
@@ -159,9 +212,9 @@ fun DateSelector(selectedDate: LocalDate, onClick: () -> Unit) {
 }
 
 @Composable
-fun SaveButton() {
+fun SaveButton(onSaveClick: () -> Unit) {
     Button(
-        onClick = { /* Lógica para guardar el gasto */ },
+        onClick = { onSaveClick() },
         modifier = Modifier.fillMaxWidth()
     ) {
         Text("Save Expense")
@@ -171,8 +224,8 @@ fun SaveButton() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryBottomSheet(
-    categories: List<String>,
-    onCategorySelected: (String) -> Unit,
+    categories: List<Category>,
+    onCategorySelected: (Category) -> Unit,
     onDismiss: () -> Unit
 ) {
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -194,9 +247,9 @@ fun CategoryBottomSheet(
             )
             categories.forEach { category ->
                 ListItem(
-                    headlineContent = { Text(text = category) },
+                    headlineContent = { Text(text = category.name) },
                     leadingContent = {
-                        Icon(imageVector = Icons.Default.Category, contentDescription = category)
+                        Icon(imageVector = category.icon, contentDescription = category.name)
                     },
                     modifier = Modifier.clickable { onCategorySelected(category) }
                 )

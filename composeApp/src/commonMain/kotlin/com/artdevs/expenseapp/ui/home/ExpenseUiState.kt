@@ -1,4 +1,6 @@
-package com.artdevs.expenseapp.domain.model
+package com.artdevs.expenseapp.ui.home
+
+import com.artdevs.expenseapp.domain.model.Expense
 
 sealed interface ExpenseUiState {
     data object Loading : ExpenseUiState
