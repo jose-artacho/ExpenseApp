@@ -35,8 +35,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.artdevs.expenseapp.data.ExpenseDataManager
 import com.artdevs.expenseapp.domain.model.Expense
+import com.artdevs.expenseapp.domain.model.ExpenseUiState
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -45,34 +45,50 @@ fun HomeScreenView(onAddExpenseClick: () -> Unit, onExpenseClick: (expense: Expe
     val viewModel = koinViewModel<HomeScreenViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.LightGray),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Header
-            HeaderSection()
+    when (state) {
+        is ExpenseUiState.Loading -> {
+            // Show loading state
+        }
 
-            // Card Section
-            CardSection(title = "Total Expense", amount = "100 €")
+        is ExpenseUiState.Success -> {
 
-            // Latest Entries
-            LatestEntriesSection(ExpenseDataManager.fakeExpenseLit) {
-                onExpenseClick(it)
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.LightGray),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Header
+                    HeaderSection()
+
+                    // Card Section
+                    CardSection(
+                        title = "Total Expense",
+                        amount = (state as ExpenseUiState.Success).totalAmount.toString() + " €"
+                    )
+
+                    // Latest Entries
+                    LatestEntriesSection((state as ExpenseUiState.Success).expenses) {
+                        onExpenseClick(it)
+                    }
+                }
+
+                FloatingActionButton(
+                    onClick = { onAddExpenseClick() },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(24.dp),
+                    containerColor = Color.Blue,
+                    contentColor = Color.White
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add New Entry")
+                }
             }
         }
 
-        FloatingActionButton(
-            onClick = { onAddExpenseClick() },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(24.dp),
-            containerColor = Color.Blue,
-            contentColor = Color.White
-        ) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "Add New Entry")
+        is ExpenseUiState.Error -> {
+            // Show Error state
         }
     }
 }

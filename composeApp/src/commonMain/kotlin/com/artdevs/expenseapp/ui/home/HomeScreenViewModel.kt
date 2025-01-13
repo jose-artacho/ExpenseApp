@@ -25,12 +25,10 @@ class HomeScreenViewModel(
         viewModelScope.launch {
             val expenses = getExpensesUseCase()
             _uiState.update {
-                if (expenses.isEmpty()) {
-                    ExpenseUiState.Empty
-                } else {
-                    val totalAmount = expenses.sumOf { it.amount }
-                    ExpenseUiState.Success(expenses, totalAmount)
-                }
+                val totalAmount = expenses.sumOf { it.amount }
+                ExpenseUiState.Success(expenses, totalAmount)
+            }.runCatching {
+                ExpenseUiState.Error("Error fetching expenses")
             }
         }
     }
