@@ -22,10 +22,4 @@ class ExpenseLocalDataSource(private val db: ExpenseDatabase) {
             category = Category.valueOf(it.category)
         )
     }
-
-    fun removeExpense(id: Int) {
-        queries.transaction {
-            queries.delete(id.toLong())
-        }
-    }
 }

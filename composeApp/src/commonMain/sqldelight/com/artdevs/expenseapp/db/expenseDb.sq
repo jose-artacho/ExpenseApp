@@ -13,8 +13,3 @@ VALUES (?,?,?,?);
 getExpenses:
 SELECT *
 FROM ExpenseEntity;
-
-delete:
-DELETE FROM ExpenseEntity
-WHERE id IS :id;
-

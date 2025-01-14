@@ -2,6 +2,7 @@ package com.artdevs.expenseapp.domain.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fastfood
+import androidx.compose.material.icons.filled.Flight
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -23,7 +24,7 @@ data class Expense(
 
 enum class Category(val icon: ImageVector) {
     RESTAURANT(Icons.Default.Fastfood),
-    TRAVEL(Icons.Default.TravelExplore),
+    TRAVEL(Icons.Default.Flight),
     SUPERMARKET(Icons.Default.ShoppingCart),
     SHOPPING(Icons.Default.ShoppingBag),
     ENTERTAINMENT(Icons.Default.SportsEsports),

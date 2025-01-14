@@ -66,7 +66,7 @@ fun HomeScreenView(navController: NavController = rememberNavController(), onAdd
                 title = {
                     Text(
                         text = "Home",
-                        fontSize = 24.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Black
                     )

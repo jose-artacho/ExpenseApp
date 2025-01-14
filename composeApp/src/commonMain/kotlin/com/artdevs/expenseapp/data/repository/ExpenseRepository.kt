@@ -6,5 +6,4 @@ interface ExpenseRepository {
 
     fun getExpenses(): List<Expense>
     fun addExpense(expense: Expense)
-    fun removeExpense(expenseId: Int)
 }
