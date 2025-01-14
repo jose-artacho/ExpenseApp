@@ -53,8 +53,8 @@ The project follows the **MVVM (Model-View-ViewModel)** architecture pattern to 
 - **Material 3**: For UI components and styling.
 
 ## Video Demo
-- Android: [Add video link here]
-- iOS: [Add video link here]
+- Android: [Demo](https://github.com/user-attachments/assets/e146ac3f-01dc-42fa-992f-cad43825e067)
+- iOS: [Demo](https://github.com/user-attachments/assets/bc6a02b9-b9ed-4761-a857-77e2ebcdad5a)
 
 ## How to Run
 1. Clone the repository.

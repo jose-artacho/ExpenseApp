@@ -107,7 +107,7 @@ fun AddExpenseScreenView(navController: NavController = rememberNavController())
         ) {
 
             ExpenseParamTextField("Description", KeyboardType.Text, description) { description = it }
-            ExpenseParamTextField("Amount", KeyboardType.Decimal, amount) { amount = it }
+            ExpenseParamTextField("Amount", KeyboardType.Decimal, amount) { amount = it.replace(",", ".") }
             CategorySelector(selectedCategory, { isCategorySheetOpen = true })
             DateSelector(selectedDate, { isDatePickerOpen = true })
             SaveButton(isButtonEnabled) {
