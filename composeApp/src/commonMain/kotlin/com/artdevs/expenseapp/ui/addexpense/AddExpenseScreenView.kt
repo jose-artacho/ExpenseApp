@@ -1,19 +1,21 @@
 package com.artdevs.expenseapp.ui.addexpense
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -70,7 +73,6 @@ fun AddExpenseScreenView(navController: NavController = rememberNavController())
         )
     }
 
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isCategorySheetOpen by remember { mutableStateOf(false) }
     var isDatePickerOpen by remember { mutableStateOf(false) }
 
@@ -104,8 +106,8 @@ fun AddExpenseScreenView(navController: NavController = rememberNavController())
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            DescriptionField(description) { description = it }
-            AmountField(amount) { amount = it }
+            ExpenseParamTextField("Description", KeyboardType.Text, description) { description = it }
+            ExpenseParamTextField("Amount", KeyboardType.Number, amount) { amount = it }
             CategorySelector(selectedCategory, { isCategorySheetOpen = true })
             DateSelector(selectedDate, { isDatePickerOpen = true })
             SaveButton {
@@ -119,10 +121,6 @@ fun AddExpenseScreenView(navController: NavController = rememberNavController())
             }
 
             when (state) {
-                is AddExpenseUiState.Loading -> {
-                    // Show loading state
-                }
-
                 is AddExpenseUiState.Success -> {
                     navController.popBackStack()
                 }
@@ -130,6 +128,7 @@ fun AddExpenseScreenView(navController: NavController = rememberNavController())
                 is AddExpenseUiState.Error -> {
                     // Show error state
                 }
+                else -> {}
             }
         }
 
@@ -157,22 +156,12 @@ fun AddExpenseScreenView(navController: NavController = rememberNavController())
 }
 
 @Composable
-fun DescriptionField(value: String, onValueChange: (String) -> Unit) {
+fun ExpenseParamTextField(text: String, keyboardType: KeyboardType, value: String, onValueChange: (String) -> Unit) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text("Description") },
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Composable
-fun AmountField(value: String, onValueChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text("Amount") },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        label = { Text(text) },
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -186,7 +175,7 @@ fun CategorySelector(selectedCategory: Category, onClick: () -> Unit) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
             Text(text = "Category: $selectedCategory", fontSize = 16.sp)
             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Select Category")
@@ -203,7 +192,7 @@ fun DateSelector(selectedDate: LocalDate, onClick: () -> Unit) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
             Text(text = "Date: $selectedDate", fontSize = 16.sp)
             Icon(imageVector = Icons.Default.DateRange, contentDescription = "Select Date")
@@ -215,9 +204,10 @@ fun DateSelector(selectedDate: LocalDate, onClick: () -> Unit) {
 fun SaveButton(onSaveClick: () -> Unit) {
     Button(
         onClick = { onSaveClick() },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().height(50.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
     ) {
-        Text("Save Expense")
+        Text("Save Expense", fontSize = 16.sp)
     }
 }
 

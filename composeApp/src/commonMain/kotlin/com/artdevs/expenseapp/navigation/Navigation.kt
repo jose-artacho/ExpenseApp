@@ -15,6 +15,7 @@ fun Navigation() {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
             HomeScreenView(
+                navController,
                 onAddExpenseClick = {
                     navController.navigate("addExpense")
                 },

@@ -13,13 +13,12 @@ class AddExpenseScreenViewModel(
     private val addExpenseUseCase: AddExpenseUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<AddExpenseUiState>(AddExpenseUiState.Loading)
+    private val _uiState = MutableStateFlow<AddExpenseUiState>(AddExpenseUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
     fun addExpense(expense: Expense) {
-        _uiState.value = AddExpenseUiState.Loading
         viewModelScope.launch {
-            val expenses = addExpenseUseCase(expense = expense)
+            addExpenseUseCase(expense = expense)
             _uiState.update {
                 AddExpenseUiState.Success
             }.runCatching {
