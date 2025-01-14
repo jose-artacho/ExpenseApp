@@ -1,6 +1,5 @@
 package com.artdevs.expenseapp.ui.home
 
-import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.artdevs.expenseapp.domain.usecases.GetExpensesUseCase

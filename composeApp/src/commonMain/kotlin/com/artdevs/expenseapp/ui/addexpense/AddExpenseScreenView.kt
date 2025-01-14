@@ -126,7 +126,7 @@ fun AddExpenseScreenView(navController: NavController = rememberNavController())
                 }
 
                 is AddExpenseUiState.Error -> {
-                    // Show error state
+                    println("Error: " + (state as AddExpenseUiState.Error).message)
                 }
                 else -> {}
             }

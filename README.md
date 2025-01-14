@@ -52,7 +52,7 @@ The project follows the **MVVM (Model-View-ViewModel)** architecture pattern to 
 - **Koin**: For dependency injection.
 - **Material 3**: For UI components and styling.
 
-## Video Demonstration
+## Video Demo
 - Android: [Add video link here]
 - iOS: [Add video link here]
 
@@ -63,8 +63,10 @@ The project follows the **MVVM (Model-View-ViewModel)** architecture pattern to 
 4. Run the app on an emulator or physical device.
 
 ## Future Improvements
+- Add UnitTests and UITests
+- Error handler
+- Texts localized
 - Add support for editing and deleting expenses.
 - Integrate cloud synchronization for data backup.
-- Implement advanced filtering and reporting features.
-- Add more tests
+- Implement advanced filtering and reporting features, like block future dates.
 
