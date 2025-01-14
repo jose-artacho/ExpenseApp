@@ -6,6 +6,6 @@ import com.artdevs.expenseapp.domain.model.Expense
 class AddExpenseUseCase(
     private val expenseRepository: ExpenseRepository
 ) {
-    suspend operator fun invoke(expense: Expense): Unit =
+    operator fun invoke(expense: Expense): Unit =
         expenseRepository.addExpense(expense)
 }
