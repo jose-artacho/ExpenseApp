@@ -1,8 +1,8 @@
 package com.artdevs.expenseapp.ui.home
 
+import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.artdevs.expenseapp.domain.model.ExpenseUiState
 import com.artdevs.expenseapp.domain.usecases.GetExpensesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,15 +13,14 @@ class HomeScreenViewModel(
     private val getExpensesUseCase: GetExpensesUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<ExpenseUiState>(ExpenseUiState.Loading)
+    private val _uiState = MutableStateFlow<ExpenseUiState>(ExpenseUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
     init {
         getAllExpenses()
     }
 
-    private fun getAllExpenses() {
-        _uiState.value = ExpenseUiState.Loading
+    fun getAllExpenses() {
         viewModelScope.launch {
             val expenses = getExpensesUseCase()
             _uiState.update {

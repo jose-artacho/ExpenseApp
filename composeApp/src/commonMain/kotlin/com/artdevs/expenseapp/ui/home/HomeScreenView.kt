@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
@@ -20,11 +23,15 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,79 +42,87 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.artdevs.expenseapp.domain.model.Expense
-import com.artdevs.expenseapp.domain.model.ExpenseUiState
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenView(onAddExpenseClick: () -> Unit, onExpenseClick: (expense: Expense) -> Unit) {
+fun HomeScreenView(navController: NavController = rememberNavController(), onAddExpenseClick: () -> Unit, onExpenseClick: (expense: Expense) -> Unit) {
 
     val viewModel = koinViewModel<HomeScreenViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    when (state) {
-        is ExpenseUiState.Loading -> {
-            // Show loading state
+    LaunchedEffect(navController.currentBackStackEntry) {
+        navController.currentBackStackEntryFlow.collect {
+            viewModel.getAllExpenses()
         }
+    }
 
-        is ExpenseUiState.Success -> {
-
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.LightGray),
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // Header
-                    HeaderSection()
-
-                    // Card Section
-                    CardSection(
-                        title = "Total Expense",
-                        amount = (state as ExpenseUiState.Success).totalAmount.toString() + " €"
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Home",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.Black
                     )
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            when (state) {
+                is ExpenseUiState.Success -> {
 
-                    // Latest Entries
-                    LatestEntriesSection((state as ExpenseUiState.Success).expenses) {
-                        onExpenseClick(it)
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.LightGray),
+                            verticalArrangement = Arrangement.SpaceBetween
+                        ) {
+
+                            CardSection(
+                                title = "Total Expense",
+                                amount = (state as ExpenseUiState.Success).totalAmount.toString() + " €"
+                            )
+                            LatestEntriesSection((state as ExpenseUiState.Success).expenses) {
+                                onExpenseClick(it)
+                            }
+                        }
+
+                        FloatingActionButton(
+                            onClick = { onAddExpenseClick() },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(24.dp),
+                            containerColor = Color.Blue,
+                            contentColor = Color.White
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add New Entry"
+                            )
+                        }
                     }
                 }
 
-                FloatingActionButton(
-                    onClick = { onAddExpenseClick() },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(24.dp),
-                    containerColor = Color.Blue,
-                    contentColor = Color.White
-                ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add New Entry")
+                is ExpenseUiState.Error -> {
+                    // Show Error state
                 }
+
+                else -> {}
             }
         }
-
-        is ExpenseUiState.Error -> {
-            // Show Error state
-        }
-    }
-}
-
-@Composable
-fun HeaderSection() {
-
-    Row(
-        modifier = Modifier.fillMaxWidth()
-            .background(Color.White)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Overview",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
     }
 }
 
@@ -175,18 +190,29 @@ fun LatestEntriesSection(expenses: List<Expense>, onExpenseClick: (expense: Expe
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        expenses.forEach { expense ->
-            EntryItem(expense = expense) {
-                onExpenseClick(it)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (expenses.isEmpty()) {
+                item {
+                    Text(
+                        text = "No expenses yet",
+                        fontSize = 18.sp,
+                        color = Color.LightGray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(vertical = 24.dp)
+                    )
+                }
+            } else {
+                items(expenses) { expense ->
+                    EntryItem(expense = expense) {
+                        onExpenseClick(it)
+                    }
+                }
             }
-        }.takeIf { expenses.isEmpty() }?.run {
-            Text(
-                modifier = Modifier.fillMaxSize().padding(24.dp),
-                text = "No expenses yet",
-                fontSize = 18.sp,
-                color = Color.LightGray,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }
