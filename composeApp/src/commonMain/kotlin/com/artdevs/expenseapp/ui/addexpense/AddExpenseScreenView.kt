@@ -74,6 +74,8 @@ fun AddExpenseScreenView(navController: NavController = rememberNavController())
     var isCategorySheetOpen by remember { mutableStateOf(false) }
     var isDatePickerOpen by remember { mutableStateOf(false) }
 
+    val isButtonEnabled = description.isNotBlank() && amount.isNotBlank()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -105,10 +107,10 @@ fun AddExpenseScreenView(navController: NavController = rememberNavController())
         ) {
 
             ExpenseParamTextField("Description", KeyboardType.Text, description) { description = it }
-            ExpenseParamTextField("Amount", KeyboardType.Number, amount) { amount = it }
+            ExpenseParamTextField("Amount", KeyboardType.Decimal, amount) { amount = it }
             CategorySelector(selectedCategory, { isCategorySheetOpen = true })
             DateSelector(selectedDate, { isDatePickerOpen = true })
-            SaveButton {
+            SaveButton(isButtonEnabled) {
                 val expense = Expense(
                     description = description,
                     amount = amount.toDouble(),
@@ -199,9 +201,10 @@ fun DateSelector(selectedDate: LocalDate, onClick: () -> Unit) {
 }
 
 @Composable
-fun SaveButton(onSaveClick: () -> Unit) {
+fun SaveButton(isButtonEnabled: Boolean, onSaveClick: () -> Unit) {
     Button(
         onClick = { onSaveClick() },
+        enabled = isButtonEnabled,
         modifier = Modifier.fillMaxWidth().height(50.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
     ) {
