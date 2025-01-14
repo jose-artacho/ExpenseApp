@@ -1,0 +1,15 @@
+CREATE TABLE ExpenseEntity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    description TEXT NOT NULL,
+    amount REAL NOT NULL,
+    date TEXT NOT NULL,
+    category TEXT NOT NULL
+);
+
+addExpense:
+INSERT INTO ExpenseEntity(description, amount, date, category)
+VALUES (?,?,?,?);
+
+getExpenses:
+SELECT *
+FROM ExpenseEntity;
